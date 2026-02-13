@@ -105,6 +105,22 @@ THEMES = {
     }
 }
 
+# Quotes de respaldo si la API falla
+FALLBACK_QUOTES = [
+    "I'm doing pretty good as far as geniuses go",
+    "I feel like I'm too busy writing history to read it",
+    "My greatest pain in life is that I will never be able to see myself perform live",
+    "I am Warhol. I am the number one most impactful artist of our generation",
+    "I am not a fan of books. I would never want a book's autograph",
+    "I make awesome decisions in bike stores",
+    "Sometimes you have to get rid of everything",
+    "I hate when I'm on a flight and I wake up with a water bottle next to me like oh great now I gotta be responsible for this water bottle",
+    "I leave my emojis bart Simpson color",
+    "I wish I had a friend like me"
+]
+
+import random
+
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
@@ -119,14 +135,20 @@ class handler(BaseHTTPRequestHandler):
             # Obtener tema o usar default
             theme_colors = THEMES.get(theme, THEMES['default'])
             
-            # Obtener quote de Kanye API
+            # Obtener quote de Kanye API o usar fallback
             try:
-                response = request.urlopen('https://api.kanye.rest/', timeout=5)
+                # Agregar User-Agent para evitar el bloqueo 403
+                req = request.Request(
+                    'https://api.kanye.rest/',
+                    headers={'User-Agent': 'Mozilla/5.0'}
+                )
+                response = request.urlopen(req, timeout=5)
                 data = json.loads(response.read())
                 quote = data['quote']
+                print(f"✅ Quote fetched from API: {quote[:50]}...", file=sys.stderr)
             except Exception as api_error:
-                print(f"Error fetching Kanye quote: {api_error}", file=sys.stderr)
-                quote = "I'm doing pretty good as far as geniuses go"
+                print(f"⚠️  API error, using fallback quote: {api_error}", file=sys.stderr)
+                quote = random.choice(FALLBACK_QUOTES)
             
             # Configuración de la imagen
             width = 800
@@ -141,7 +163,7 @@ class handler(BaseHTTPRequestHandler):
                 quote_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 32)
                 author_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
             except Exception as font_error:
-                print(f"Font error: {font_error}, using default", file=sys.stderr)
+                print(f"⚠️  Font error, using default: {font_error}", file=sys.stderr)
                 quote_font = ImageFont.load_default()
                 author_font = ImageFont.load_default()
             
@@ -171,8 +193,8 @@ class handler(BaseHTTPRequestHandler):
                 draw.text((x, y), line, font=quote_font, fill=theme_colors['quote_color'])
                 y += line_heights[i] + 10
             
-            # Dibujar autor
-            author = "— Kanye West"
+            # Dibujar autor (usando guion simple en lugar de em-dash)
+            author = "- Kanye West"
             author_bbox = draw.textbbox((0, 0), author, font=author_font)
             author_width = author_bbox[2] - author_bbox[0]
             author_x = (width - author_width) // 2
