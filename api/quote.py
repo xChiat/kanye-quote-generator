@@ -160,8 +160,8 @@ class handler(BaseHTTPRequestHandler):
             
             # Cargar fuente
             try:
-                quote_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 32)
-                author_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+                quote_font = ImageFont.truetype("assets/BebasNeue-Regular.ttf", 32)
+                author_font = ImageFont.truetype("assets/BebasNeue-Regular.ttf", 24)
             except Exception as font_error:
                 print(f"⚠️  Font error, using default: {font_error}", file=sys.stderr)
                 quote_font = ImageFont.load_default()
