@@ -3,11 +3,11 @@
 
 from http.server import BaseHTTPRequestHandler
 from urllib import request, parse
-import json
 import io
 import textwrap
 import traceback
 import sys
+import random
 
 # Importar PIL con manejo de errores
 try:
@@ -89,6 +89,13 @@ THEMES = {
         'author_color': (129, 161, 193),
         'accent_color': (143, 188, 187)
     },
+    'yeezus': {
+        'bg_color': (0, 0, 0),
+        'text_color': (255, 255, 255),
+        'quote_color': (220, 38, 38),  # Rojo intenso del cover de Yeezus
+        'author_color': (156, 163, 175),  # Gris
+        'accent_color': (220, 38, 38)  # Rojo para el borde
+    },
     'kanye': {
         'bg_color': (0, 0, 0),
         'text_color': (255, 255, 255),
@@ -119,8 +126,6 @@ FALLBACK_QUOTES = [
     "I wish I had a friend like me"
 ]
 
-import random
-
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
@@ -135,16 +140,15 @@ class handler(BaseHTTPRequestHandler):
             # Obtener tema o usar default
             theme_colors = THEMES.get(theme, THEMES['default'])
             
-            # Obtener quote de Kanye API o usar fallback
+            # Obtener quote de Kanye API usando el endpoint /text
             try:
-                # Agregar User-Agent para evitar el bloqueo 403
+                # Usar el endpoint /text que devuelve texto plano
                 req = request.Request(
-                    'https://api.kanye.rest/',
-                    headers={'User-Agent': 'Mozilla/5.0'}
+                    'https://api.kanye.rest/text',
+                    headers={'User-Agent': 'Mozilla/5.0 (Kanye Quote Generator)'}
                 )
                 response = request.urlopen(req, timeout=5)
-                data = json.loads(response.read())
-                quote = data['quote']
+                quote = response.read().decode('utf-8').strip()
                 print(f"✅ Quote fetched from API: {quote[:50]}...", file=sys.stderr)
             except Exception as api_error:
                 print(f"⚠️  API error, using fallback quote: {api_error}", file=sys.stderr)
@@ -193,7 +197,7 @@ class handler(BaseHTTPRequestHandler):
                 draw.text((x, y), line, font=quote_font, fill=theme_colors['quote_color'])
                 y += line_heights[i] + 10
             
-            # Dibujar autor (usando guion simple en lugar de em-dash)
+            # Dibujar autor (usando guion simple)
             author = "- Kanye West"
             author_bbox = draw.textbbox((0, 0), author, font=author_font)
             author_width = author_bbox[2] - author_bbox[0]
