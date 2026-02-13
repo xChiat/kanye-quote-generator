@@ -4,9 +4,18 @@
 from http.server import BaseHTTPRequestHandler
 from urllib import request, parse
 import json
-from PIL import Image, ImageDraw, ImageFont
 import io
 import textwrap
+import traceback
+import sys
+
+# Importar PIL con manejo de errores
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    PIL_AVAILABLE = True
+except ImportError as e:
+    PIL_AVAILABLE = False
+    PIL_ERROR = str(e)
 
 # Definición de temas
 THEMES = {
@@ -99,6 +108,10 @@ THEMES = {
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
+            # Verificar si PIL está disponible
+            if not PIL_AVAILABLE:
+                raise ImportError(f"PIL/Pillow not available: {PIL_ERROR}")
+            
             # Parse query parameters
             query_components = parse.parse_qs(parse.urlparse(self.path).query)
             theme = query_components.get('theme', ['default'])[0].lower()
@@ -107,34 +120,33 @@ class handler(BaseHTTPRequestHandler):
             theme_colors = THEMES.get(theme, THEMES['default'])
             
             # Obtener quote de Kanye API
-            response = request.urlopen('https://api.kanye.rest/')
-            data = json.loads(response.read())
-            quote = data['quote']
+            try:
+                response = request.urlopen('https://api.kanye.rest/', timeout=5)
+                data = json.loads(response.read())
+                quote = data['quote']
+            except Exception as api_error:
+                print(f"Error fetching Kanye quote: {api_error}", file=sys.stderr)
+                quote = "I'm doing pretty good as far as geniuses go"
             
             # Configuración de la imagen
             width = 800
             height = 400
-            padding = 40
             
             # Crear imagen
             img = Image.new('RGB', (width, height), theme_colors['bg_color'])
             draw = ImageDraw.Draw(img)
             
-            # Intentar cargar fuente personalizada, si no usar default
+            # Cargar fuente
             try:
-                quote_font = ImageFont.truetype("assets/BebasNeue-Regular.ttf", 32)
-                author_font = ImageFont.truetype("assets/BebasNeue-Regular.ttf", 24)
-            except:
-                try:
-                    # Intentar con fuentes del sistema
-                    quote_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 32)
-                    author_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
-                except:
-                    quote_font = ImageFont.load_default()
-                    author_font = ImageFont.load_default()
+                quote_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 32)
+                author_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+            except Exception as font_error:
+                print(f"Font error: {font_error}, using default", file=sys.stderr)
+                quote_font = ImageFont.load_default()
+                author_font = ImageFont.load_default()
             
-            # Wrap text para que no se salga de la imagen
-            max_width = 45  # caracteres por línea
+            # Wrap text
+            max_width = 45
             wrapped_quote = textwrap.fill(f'"{quote}"', width=max_width)
             
             # Calcular posición del texto centrado
@@ -146,9 +158,9 @@ class handler(BaseHTTPRequestHandler):
                 bbox = draw.textbbox((0, 0), line, font=quote_font)
                 line_height = bbox[3] - bbox[1]
                 line_heights.append(line_height)
-                total_height += line_height + 10  # 10px entre líneas
+                total_height += line_height + 10
             
-            # Posición inicial Y (centrado verticalmente)
+            # Posición inicial Y
             y = (height - total_height) // 2 - 20
             
             # Dibujar cada línea centrada
@@ -168,7 +180,7 @@ class handler(BaseHTTPRequestHandler):
             
             draw.text((author_x, author_y), author, font=author_font, fill=theme_colors['author_color'])
             
-            # Opcional: Agregar borde decorativo
+            # Agregar borde
             border_width = 3
             draw.rectangle(
                 [(border_width, border_width), (width - border_width, height - border_width)],
@@ -190,22 +202,43 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(img_byte_arr.getvalue())
             
+            print(f"✅ Successfully generated image with theme: {theme}", file=sys.stderr)
+            
         except Exception as e:
-            # En caso de error, devolver imagen con mensaje de error
+            # Log del error completo
+            error_trace = traceback.format_exc()
+            print(f"❌ ERROR: {str(e)}", file=sys.stderr)
+            print(error_trace, file=sys.stderr)
+            
+            # Enviar respuesta de error como imagen
             self.send_response(500)
             self.send_header('Content-Type', 'image/png')
             self.end_headers()
             
-            # Crear imagen de error
-            error_img = Image.new('RGB', (800, 400), (40, 40, 40))
-            error_draw = ImageDraw.Draw(error_img)
-            error_text = f"Error: {str(e)}"
-            error_draw.text((50, 180), error_text, fill=(255, 100, 100))
-            
-            error_byte_arr = io.BytesIO()
-            error_img.save(error_byte_arr, format='PNG')
-            error_byte_arr.seek(0)
-            self.wfile.write(error_byte_arr.getvalue())
+            try:
+                error_img = Image.new('RGB', (800, 400), (40, 40, 40))
+                error_draw = ImageDraw.Draw(error_img)
+                
+                error_lines = [
+                    "Error generating Kanye quote:",
+                    "",
+                    str(e)[:80],
+                    "",
+                    "Check server logs for details"
+                ]
+                
+                y_pos = 100
+                for line in error_lines:
+                    error_draw.text((50, y_pos), line, fill=(255, 100, 100))
+                    y_pos += 30
+                
+                error_byte_arr = io.BytesIO()
+                error_img.save(error_byte_arr, format='PNG')
+                error_byte_arr.seek(0)
+                self.wfile.write(error_byte_arr.getvalue())
+            except:
+                # Si ni siquiera podemos crear la imagen de error
+                self.wfile.write(b'Error: Unable to generate image')
 
     def do_HEAD(self):
         self.send_response(200)
