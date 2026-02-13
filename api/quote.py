@@ -86,10 +86,10 @@ THEMES = {
         'accent_color': (185, 200, 207) 
     },
     'kanye': {
-        'bg_color': (94, 121, 167),
+        'bg_color': (42, 56, 76),
         'quote_color': (106,228,100),
         'author_color': (142, 170, 207),
-        'accent_color': (42, 56, 76)
+        'accent_color': (94, 121, 167)
     },
     'default': {
         'bg_color': (13, 17, 23),
@@ -143,7 +143,7 @@ class handler(BaseHTTPRequestHandler):
             
             # Configuración de la imagen
             width = 800
-            height = 400
+            height = 300
             
             # Crear imagen
             img = Image.new('RGB', (width, height), theme_colors['bg_color'])
@@ -194,7 +194,7 @@ class handler(BaseHTTPRequestHandler):
             draw.text((author_x, author_y), author, font=author_font, fill=theme_colors['author_color'])
             
             # Agregar borde
-            border_width = 3
+            border_width = 5
             draw.rectangle(
                 [(border_width, border_width), (width - border_width, height - border_width)],
                 outline=theme_colors['accent_color'],
