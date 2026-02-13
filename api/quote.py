@@ -21,91 +21,78 @@ except ImportError as e:
 THEMES = {
     'radical': {
         'bg_color': (20, 23, 31),
-        'text_color': (254, 254, 254),
         'quote_color': (255, 121, 198),
         'author_color': (139, 148, 158),
         'accent_color': (255, 121, 198)
     },
     'react': {
         'bg_color': (32, 42, 53),
-        'text_color': (97, 218, 251),
         'quote_color': (97, 218, 251),
         'author_color': (139, 148, 158),
         'accent_color': (0, 216, 255)
     },
     'omni': {
         'bg_color': (25, 22, 34),
-        'text_color': (255, 122, 199),
         'quote_color': (232, 223, 122),
         'author_color': (216, 216, 221),
         'accent_color': (255, 122, 199)
     },
     'dark': {
         'bg_color': (13, 17, 23),
-        'text_color': (201, 209, 217),
         'quote_color': (88, 166, 255),
         'author_color': (139, 148, 158),
         'accent_color': (88, 166, 255)
     },
     'github_dark': {
         'bg_color': (13, 17, 23),
-        'text_color': (201, 209, 217),
         'quote_color': (79, 192, 141),
         'author_color': (139, 148, 158),
         'accent_color': (79, 192, 141)
     },
     'tokyonight': {
         'bg_color': (26, 27, 38),
-        'text_color': (169, 177, 214),
         'quote_color': (122, 162, 247),
         'author_color': (86, 95, 137),
         'accent_color': (187, 154, 247)
     },
     'dracula': {
         'bg_color': (40, 42, 54),
-        'text_color': (248, 248, 242),
         'quote_color': (255, 121, 198),
         'author_color': (98, 114, 164),
         'accent_color': (189, 147, 249)
     },
     'monokai': {
         'bg_color': (39, 40, 34),
-        'text_color': (248, 248, 240),
         'quote_color': (249, 38, 114),
         'author_color': (117, 113, 94),
         'accent_color': (166, 226, 46)
     },
     'gruvbox': {
         'bg_color': (40, 40, 40),
-        'text_color': (235, 219, 178),
         'quote_color': (254, 128, 25),
         'author_color': (168, 153, 132),
         'accent_color': (184, 187, 38)
     },
     'nord': {
         'bg_color': (46, 52, 64),
-        'text_color': (216, 222, 233),
         'quote_color': (136, 192, 208),
         'author_color': (129, 161, 193),
         'accent_color': (143, 188, 187)
     },
     'yeezus': {
-        'bg_color': (0, 0, 0),
-        'text_color': (255, 255, 255),
-        'quote_color': (220, 38, 38),  # Rojo intenso del cover de Yeezus
-        'author_color': (156, 163, 175),  # Gris
-        'accent_color': (220, 38, 38)  # Rojo para el borde
+        'bg_color': (254, 254, 254),
+        'quote_color': (251, 0, 0), 
+        'author_color': (186, 194, 146),  
+        'accent_color': (185, 200, 207) 
     },
     'kanye': {
-        'bg_color': (0, 0, 0),
-        'text_color': (255, 255, 255),
-        'quote_color': (255, 215, 0),
-        'author_color': (192, 192, 192),
-        'accent_color': (255, 215, 0)
+        'bg_color': (94, 121, 167),
+        'quote_color': (106,228,100),
+        'author_color': (142, 170, 207),
+        'accent_color': (42, 56, 76)
     },
     'default': {
         'bg_color': (13, 17, 23),
-        'text_color': (201, 209, 217),
         'quote_color': (255, 121, 198),
         'author_color': (139, 148, 158),
         'accent_color': (255, 121, 198)
