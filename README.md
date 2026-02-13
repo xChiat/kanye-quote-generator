@@ -23,7 +23,7 @@ A serverless API that generates random Kanye West quotes as images, perfect for 
 | `radical` (default) | ![](https://kanye-quote-generator-silk.vercel.app/?theme=radical) |
 | `yeezus` | ![](https://kanye-quote-generator-silk.vercel.app/?theme=yeezus) |
 | `react` | ![](https://kanye-quote-generator-silk.vercel.app/?theme=react) |
-| `omni` | ![](https://kanye-quote-generator-silk.vercel.app/?theme=omni) |
+| `omni` | ![](https://kanye-quote-generator-silk.vercel.app//?theme=omni) |
 | `dark` | ![](https://kanye-quote-generator-silk.vercel.app/?theme=dark) |
 | `github_dark` | ![](https://kanye-quote-generator-silk.vercel.app/?theme=github_dark) |
 | `tokyonight` | ![](https://kanye-quote-generator-silk.vercel.app/?theme=tokyonight) |
@@ -157,6 +157,7 @@ MIT License - feel free to use this in your own projects!
 ## 🌊 Fun Facts
 
 - The `yeezus` theme is inspired by the iconic minimalist red tape design of the Yeezus album
+- The `kanye` theme is inspired by the colors of the Ye album
 - Each image is generated on-demand, so you get a fresh quote every time
 - No data is stored or tracked - pure serverless magic
 - Built during a late-night coding session because why not? 🤷‍♂️
